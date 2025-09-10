@@ -1,0 +1,13 @@
+{
+  "itemGroup.survivalasterisk": "Example Mod Tab",
+  "block.survivalasterisk.example_block": "Example Block",
+  "item.survivalasterisk.example_item": "Example Item",
+
+  "survivalasterisk.configuration.title": "Survival Asterisk Configs",
+  "survivalasterisk.configuration.section.survivalasterisk.common.toml": "Survival Asterisk Configs",
+  "survivalasterisk.configuration.section.survivalasterisk.common.toml.title": "Survival Asterisk Configs",
+  "survivalasterisk.configuration.items": "Item List",
+  "survivalasterisk.configuration.logDirtBlock": "Log Dirt Block",
+  "survivalasterisk.configuration.magicNumberIntroduction": "Magic Number Text",
+  "survivalasterisk.configuration.magicNumber": "Magic Number"
+}
