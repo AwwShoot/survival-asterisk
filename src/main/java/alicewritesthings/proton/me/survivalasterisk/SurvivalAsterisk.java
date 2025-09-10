@@ -75,6 +75,9 @@ public class SurvivalAsterisk {
     }
 
     private void randomizeRespawn(PlayerRespawnPositionEvent event) {
+        if(event.isFromEndFight()) {
+            return; // let the winner go home to spawn
+        }
         int minRespawnDistance = Config.MIN_RESPAWN_RADIUS.getAsInt();
         int maxRespawnDistance = Config.MAX_RESPAWN_RADIUS.getAsInt();
         Random random = new Random();//I'm sure I should use the in-game in-built randomization but that sounds like a hassle to drag into here
@@ -92,8 +95,8 @@ public class SurvivalAsterisk {
     private void applyRespawnEffects(PlayerEvent.PlayerRespawnEvent event) {
         Player player = event.getEntity();
         if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 600));
-            serverPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 600));
+            serverPlayer.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 900));
+            serverPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 900));
         }
 
     }
