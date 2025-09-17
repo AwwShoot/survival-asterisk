@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent;
 import org.slf4j.Logger;
@@ -56,26 +57,31 @@ public class SurvivalAsterisk {
     public SurvivalAsterisk(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
-        NeoForge.EVENT_BUS.addListener(this::randomizeRespawn);
-        NeoForge.EVENT_BUS.addListener(this::applyRespawnEffects);
+
+
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+
+        NeoForge.EVENT_BUS.addListener(this::randomizeRespawn);
+        NeoForge.EVENT_BUS.addListener(this::applyRespawnEffects);
+
+        NeoForge.EVENT_BUS.addListener(this::applyMinimumDamage);
+
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
 
         if (Config.RANDOM_RESPAWNS.getAsBoolean()) {
-            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
+            LOGGER.info("Respawns are randomized sucker!");
         }
 
-        LOGGER.info("{}{}", Config.MIN_DAMAGE_THRESHOLD.get(), Config.MIN_DAMAGE_THRESHOLD.getAsInt());
+        LOGGER.info("Minimum damage is {} be careful taking more than {} damage", Config.MINIMUM_DAMAGE.get(), Config.MIN_DAMAGE_THRESHOLD.getAsInt());
     }
 
     private void randomizeRespawn(PlayerRespawnPositionEvent event) {
-        if(event.isFromEndFight()) {
+        if(event.isFromEndFight() || !Config.RANDOM_RESPAWNS.get()) {
             return; // let the winner go home to spawn
         }
         int minRespawnDistance = Config.MIN_RESPAWN_RADIUS.getAsInt();
@@ -93,12 +99,24 @@ public class SurvivalAsterisk {
     }
 
     private void applyRespawnEffects(PlayerEvent.PlayerRespawnEvent event) {
+        if(!Config.RANDOM_RESPAWNS.get()) {
+            return;
+        }
         Player player = event.getEntity();
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 900));
             serverPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 900));
         }
 
+    }
+
+    private void applyMinimumDamage(LivingDamageEvent.Pre event) {
+        if(!Config.MINIMUM_DAMAGE.get()) {
+            return;
+        }
+        if(event.getOriginalDamage() >= Config.MIN_DAMAGE_THRESHOLD.getAsInt() && event.getNewDamage() < 1) {
+            event.setNewDamage(1);
+        }
     }
 
 

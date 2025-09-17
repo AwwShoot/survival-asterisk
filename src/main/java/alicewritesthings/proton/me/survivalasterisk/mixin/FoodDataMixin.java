@@ -1,5 +1,6 @@
 package alicewritesthings.proton.me.survivalasterisk.mixin;
 
+import alicewritesthings.proton.me.survivalasterisk.Config;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.food.FoodData;
@@ -8,6 +9,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import net.minecraft.world.Difficulty;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FoodData.class)
 public abstract class FoodDataMixin {
@@ -25,10 +29,20 @@ public abstract class FoodDataMixin {
 
     /**
      * @author Survival Asterisk
-     * @reason completely overhauling the relation between hunger and health. Sorry for the inconvenience
+     * @reason completely overhauling the relation between hunger and health if the config is true. Sorry for the inconvenience
      */
-    @Overwrite
-    public void tick(ServerPlayer player) {
+    @Inject(at = @At("HEAD"), method = "tick", cancellable = true)
+    public void applyNewTick(ServerPlayer Player, CallbackInfo info){
+        // Marginally better than an overwrite I think
+        if(Config.SATURATION_FIXING.get()) {
+            asteriskTick(Player);
+            info.cancel();
+        }
+    }
+
+
+    public void asteriskTick(ServerPlayer player) {
+
         ServerLevel serverlevel = player.level();
         Difficulty difficulty = serverlevel.getDifficulty();
         if (this.exhaustionLevel > 4.0F) {
