@@ -3,7 +3,8 @@
   "package": "alicewritesthings.proton.me.survivalasterisk.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerMixin"
+    "ServerPlayerMixin",
+    "FoodDataMixin"
   ],
   "injectors": {
     "defaultRequire": 1
